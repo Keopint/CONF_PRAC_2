@@ -12,7 +12,7 @@ def test_get_direct_dependencies_success(mock_fetch):
     }
 
     result = get_direct_dependencies("https://pypi.org", "test-pkg")
-    assert result == ["requests>=2.0", "urllib3"]
+    assert result == ["requests", "urllib3"]
 
 
 @patch("src.fetcher.fetch_package_metadata")

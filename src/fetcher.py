@@ -1,14 +1,20 @@
 import json
+import re
 import urllib.error
 import urllib.request
 
 HTTP_NOT_FOUND = 404
 
 
+def clean_package_name(dependency_str: str) -> str:
+    """Extracts the bare package name from a dependency string."""
+    match = re.match(r"^[a-zA-Z0-9_\-\.]+", dependency_str)
+    if match:
+        return match.group(0)
+    return dependency_str
+
+
 def fetch_package_metadata(repo_url: str, package_name: str) -> dict:
-    """
-    Fetches package metadata from PyPI JSON API.
-    """
     base_url = repo_url.rstrip("/")
     url = f"{base_url}/pypi/{package_name}/json"
 
@@ -35,11 +41,9 @@ def fetch_package_metadata(repo_url: str, package_name: str) -> dict:
 def get_direct_dependencies(repo_url: str, package_name: str) -> list[str]:
     metadata = fetch_package_metadata(repo_url, package_name)
     info = metadata.get("info", {})
-
-    # 'requires_dist' contains the list of dependencies
     dependencies = info.get("requires_dist")
 
     if not dependencies:
         return []
 
-    return dependencies
+    return [clean_package_name(dep) for dep in dependencies]
