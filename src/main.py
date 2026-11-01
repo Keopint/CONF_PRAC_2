@@ -1,5 +1,6 @@
 import argparse
 import sys
+from src import fetcher
 
 MIN_DEPTH = 1
 MAX_DEPTH_LIMIT = 100
@@ -67,11 +68,33 @@ def print_configuration(args: argparse.Namespace) -> None:
     print("-----------------------------")
 
 
+def process_dependencies(args: argparse.Namespace) -> None:
+    if args.test_mode:
+        print("Test mode will be implemented in Stage 3.")
+        return
+
+    try:
+        print(f"Fetching data for package: {args.package}...")
+        deps = fetcher.get_direct_dependencies(args.repo, args.package)
+
+        print(f"\nDirect dependencies for '{args.package}':")
+        if not deps:
+            print("  No direct dependencies found.")
+        else:
+            for dep in deps:
+                print(f"  - {dep}")
+
+    except ValueError as error:
+        print(f"Data collection error: {error}", file=sys.stderr)
+        sys.exit(1)
+
+
 def main() -> None:
     try:
         args = parse_arguments()
         validate_arguments(args)
         print_configuration(args)
+        process_dependencies(args)
     except ValueError as error:
         print(f"Configuration error: {error}", file=sys.stderr)
         sys.exit(1)
