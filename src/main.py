@@ -27,6 +27,10 @@ def parse_arguments() -> argparse.Namespace:
         help="Mode for outputting dependencies in ASCII-tree format."
     )
     parser.add_argument(
+        "--install-order", action="store_true",
+        help="Show the order of dependency loading (installation)."
+    )
+    parser.add_argument(
         "--max-depth", type=int, required=True,
         help="Maximum depth of dependency analysis."
     )
@@ -52,15 +56,16 @@ def print_configuration(args: argparse.Namespace) -> None:
     print(f"repository: {args.repo}")
     print(f"test_mode: {args.test_mode}")
     print(f"ascii_tree: {args.ascii_tree}")
+    print(f"install_order: {args.install_order}")
     print(f"max_depth: {args.max_depth}")
     print("-----------------------------")
 
 
-def display_graph(dep_graph: dict[str, list[str]]) -> None:
-    print("\n--- Dependency Graph (BFS) ---")
-    for pkg, deps in dep_graph.items():
-        deps_str = ", ".join(deps) if deps else "None"
-        print(f"{pkg} -> {deps_str}")
+def display_installation_order(order: list[str]) -> None:
+    print("\n--- Installation Order (Bottom-Up) ---")
+    for index, pkg in enumerate(order):
+        print(f"{index + 1}. {pkg}")
+    print("--------------------------------------")
 
 
 def main() -> None:
@@ -78,7 +83,15 @@ def main() -> None:
             test_filepath=args.repo if args.test_mode else ""
         )
 
-        display_graph(dep_graph)
+        if args.install_order:
+            order = graph.get_installation_order(dep_graph)
+            display_installation_order(order)
+        else:
+            # Fallback for previous stage demo
+            print("\nGraph built successfully. Use --install-order to see it.")
+            for pkg, deps in dep_graph.items():
+                deps_str = ", ".join(deps) if deps else "None"
+                print(f"{pkg} -> {deps_str}")
 
     except ValueError as error:
         print(f"Error: {error}", file=sys.stderr)

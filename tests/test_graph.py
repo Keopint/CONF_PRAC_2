@@ -1,5 +1,5 @@
 import pytest
-from src.graph import build_dependency_graph
+from src.graph import build_dependency_graph, get_installation_order
 
 TEST_FILE = "test_repo.txt"
 
@@ -21,3 +21,19 @@ def test_bfs_graph_cycle_and_depth():
     assert graph["E"] == []
     assert graph["A"] == ["B", "C"]
     assert graph["B"] == ["D"]
+
+
+def test_installation_order():
+    graph_data = {
+        "A": ["B", "C"],
+        "B": ["D"],
+        "C": ["D"],
+        "D": []
+    }
+
+    order = get_installation_order(graph_data)
+
+    assert order[0] == "D"
+    assert order[-1] == "A"
+    assert order.index("D") < order.index("B")
+    assert order.index("D") < order.index("C")

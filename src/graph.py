@@ -58,3 +58,34 @@ def build_dependency_graph(
                 queue.append((dep, current_depth + 1))
 
     return graph
+
+
+def get_installation_order(graph: dict[str, list[str]]) -> list[str]:
+    visited = set()
+    order = []
+
+    for start_node in graph:
+        if start_node in visited:
+            continue
+
+        stack = [(start_node, False)]
+
+        while stack:
+            node, is_processed = stack.pop()
+
+            if is_processed:
+                order.append(node)
+                continue
+
+            if node in visited:
+                continue
+
+            visited.add(node)
+
+            stack.append((node, True))
+
+            for dep in graph.get(node, []):
+                if dep not in visited:
+                    stack.append((dep, False))
+
+    return order
