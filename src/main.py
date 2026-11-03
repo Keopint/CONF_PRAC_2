@@ -6,34 +6,35 @@ MIN_DEPTH = 1
 MAX_DEPTH_LIMIT = 100
 ERROR_EXIT_CODE = 1
 START_INDEX = 1
-
+COMMANDS = ["--package", "--repo", "--test-mode",
+                "--ascii-tree", "--install-order", "--max-depth"]
 
 def parse_arguments() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Dependency graph visualization tool."
     )
     parser.add_argument(
-        "--package", type=str, required=True,
+        COMMANDS[0], type=str, required=True,
         help="Name of the analyzed package."
     )
     parser.add_argument(
-        "--repo", type=str, required=True,
+        COMMANDS[1], type=str, required=True,
         help="Repository URL or path to the test repository file."
     )
     parser.add_argument(
-        "--test-mode", action="store_true",
+        COMMANDS[2], action="store_true",
         help="Mode of working with the test repository."
     )
     parser.add_argument(
-        "--ascii-tree", action="store_true",
+        COMMANDS[3], action="store_true",
         help="Mode for outputting dependencies in ASCII-tree format."
     )
     parser.add_argument(
-        "--install-order", action="store_true",
+        COMMANDS[4], action="store_true",
         help="Show the order of dependency loading (installation)."
     )
     parser.add_argument(
-        "--max-depth", type=int, required=True,
+        COMMANDS[5], type=int, required=True,
         help="Maximum depth of dependency analysis."
     )
     return parser.parse_args()
@@ -78,7 +79,9 @@ def display_graph(dep_graph: dict[str, list[str]]) -> None:
         print(f"{pkg} -> {deps_str}")
 
 
-def process_output(args: argparse.Namespace, dep_graph: dict[str, list[str]]) -> None:
+def process_output(args: argparse.Namespace,
+                   dep_graph:
+                   dict[str, list[str]]) -> None:
     if args.install_order:
         order = graph.get_installation_order(dep_graph)
         display_installation_order(order)
