@@ -1,8 +1,7 @@
+MAX_SPLIT_COUNT = 1
+
+
 def parse_test_repository(filepath: str) -> dict[str, list[str]]:
-    """
-    Parses a local text file representing a dependency graph.
-    Format: 'PACKAGE: DEP1 DEP2'
-    """
     graph = {}
     try:
         with open(filepath, "r", encoding="utf-8") as file:
@@ -14,7 +13,7 @@ def parse_test_repository(filepath: str) -> dict[str, list[str]]:
                 if ":" not in line:
                     continue
 
-                package, deps_str = line.split(":", 1)
+                package, deps_str = line.split(":", MAX_SPLIT_COUNT)
                 package = package.strip()
                 dependencies = deps_str.split()
 

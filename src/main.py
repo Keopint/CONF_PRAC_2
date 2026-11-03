@@ -4,6 +4,8 @@ from src import graph
 
 MIN_DEPTH = 1
 MAX_DEPTH_LIMIT = 100
+ERROR_EXIT_CODE = 1
+START_INDEX = 1
 
 
 def parse_arguments() -> argparse.Namespace:
@@ -38,6 +40,7 @@ def parse_arguments() -> argparse.Namespace:
 
 
 def validate_arguments(args: argparse.Namespace) -> None:
+    """Validates the parsed arguments."""
     if not args.package.strip():
         raise ValueError("Package name cannot be empty.")
 
@@ -63,9 +66,24 @@ def print_configuration(args: argparse.Namespace) -> None:
 
 def display_installation_order(order: list[str]) -> None:
     print("\n--- Installation Order (Bottom-Up) ---")
-    for index, pkg in enumerate(order):
-        print(f"{index + 1}. {pkg}")
+    for index, pkg in enumerate(order, start=START_INDEX):
+        print(f"{index}. {pkg}")
     print("--------------------------------------")
+
+
+def display_graph(dep_graph: dict[str, list[str]]) -> None:
+    print("\n--- Dependency Graph ---")
+    for pkg, deps in dep_graph.items():
+        deps_str = ", ".join(deps) if deps else "None"
+        print(f"{pkg} -> {deps_str}")
+
+
+def process_output(args: argparse.Namespace, dep_graph: dict[str, list[str]]) -> None:
+    if args.install_order:
+        order = graph.get_installation_order(dep_graph)
+        display_installation_order(order)
+    else:
+        display_graph(dep_graph)
 
 
 def main() -> None:
@@ -83,19 +101,11 @@ def main() -> None:
             test_filepath=args.repo if args.test_mode else ""
         )
 
-        if args.install_order:
-            order = graph.get_installation_order(dep_graph)
-            display_installation_order(order)
-        else:
-            # Fallback for previous stage demo
-            print("\nGraph built successfully. Use --install-order to see it.")
-            for pkg, deps in dep_graph.items():
-                deps_str = ", ".join(deps) if deps else "None"
-                print(f"{pkg} -> {deps_str}")
+        process_output(args, dep_graph)
 
     except ValueError as error:
         print(f"Error: {error}", file=sys.stderr)
-        sys.exit(1)
+        sys.exit(ERROR_EXIT_CODE)
 
 
 if __name__ == "__main__":

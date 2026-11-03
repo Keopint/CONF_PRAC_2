@@ -3,6 +3,7 @@ from src import fetcher
 from src import parser
 
 START_DEPTH = 0
+DEPTH_INCREMENT = 1
 
 
 def _fetch_dependencies(
@@ -55,7 +56,8 @@ def build_dependency_graph(
 
         for dep in deps:
             if dep not in visited:
-                queue.append((dep, current_depth + 1))
+                new_depth = current_depth + DEPTH_INCREMENT
+                queue.append((dep, new_depth))
 
     return graph
 
@@ -81,7 +83,6 @@ def get_installation_order(graph: dict[str, list[str]]) -> list[str]:
                 continue
 
             visited.add(node)
-
             stack.append((node, True))
 
             for dep in graph.get(node, []):

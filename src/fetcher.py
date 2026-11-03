@@ -7,7 +7,6 @@ HTTP_NOT_FOUND = 404
 
 
 def clean_package_name(dependency_str: str) -> str:
-    """Extracts the bare package name from a dependency string."""
     match = re.match(r"^[a-zA-Z0-9_\-\.]+", dependency_str)
     if match:
         return match.group(0)

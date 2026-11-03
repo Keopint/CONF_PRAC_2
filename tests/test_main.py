@@ -3,7 +3,6 @@ from src.main import parse_arguments
 
 
 def test_parse_arguments_success(monkeypatch):
-    """Tests successful parsing of arguments."""
     test_args = [
         "main.py",
         "--package", "requests",
